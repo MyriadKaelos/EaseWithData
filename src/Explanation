@@ -1,0 +1,22 @@
+The programming language java has a relatively steep learning
+curve when it comes to branching out. In other words, it's easy
+to learn the basics of it, but since it is such a versatile language,
+it's incredibly difficult to learn all of java. That's why I made Ease.
+With this, I intend to streamline the process of building computer
+applications. I have linked the keyboard, mouse, and screen together into
+one package, as well as made it possible to connect different versions of
+a project across multiple separate computers. This is done using the
+Server/Client capabilities already in place by the normal Java framework,
+but made more accessible through Ease. I have also made it easier to
+paint and create images on the screen. I have done this by simplifying
+and shrinking down extensive code used to make rectangles into simple
+one-liners.
+
+I have created and Example iteration of the code which I have included in
+this file.
+Instead of the 30 or so lines of code needed to create a panel with which to
+place different visuals, I have simplified that process and made it automatic
+whenever ease is used. It now takes one line to do that. It also
+automatically connects the keyListener, (which I have utilized to display
+the character of whichever key is pressed), the mouseListener, and if
+need be, made it automatically connect a server with its client.
