@@ -1,0 +1,17 @@
+import java.awt.*;
+import java.awt.event.KeyEvent;
+
+public class Example extends Ease {
+    public Example(int width, int height, int res, int refreshRate) throws InterruptedException {
+        super(width, height, res, refreshRate);
+    }
+    public static void main(String[] args) throws InterruptedException {
+        Example e = new Example(400,400,4,100);
+    }
+    public void paint() {
+        rect(50,50,30,30,Color.blue);
+    }
+    public void keyPressed(KeyEvent e) {
+        System.err.println(e.getKeyChar());
+    }
+}
