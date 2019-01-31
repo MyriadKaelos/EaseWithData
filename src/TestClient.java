@@ -3,9 +3,10 @@ import static java.awt.Color.black;
 public class TestClient extends Ease2 {
     int ballX = width/2;
     int ballY = height/2;
-    int vX = 8;
-    int vY = 8;
+    int vX = 4;
+    int vY = 4;
     int opponent = 0;
+    int timePassed = 0;
     public TestClient(int width, int height, int refreshRate) throws InterruptedException {
         super(width, height, refreshRate, "UDPclient");
     }
@@ -18,19 +19,44 @@ public class TestClient extends Ease2 {
         me();
         you();
         send();
+        timePassed++;
+    }
+    public byte[] toByteConvert(int[] arr) {
+        byte[] b = new byte[15];
+        for(int i = 0; i < arr.length; i ++) {
+            b[(i*3)] = (byte) (Math.abs(arr[i])%128);
+            b[(i*3)+1] = (byte) (Math.abs(arr[i])/128);
+            b[(i*3)+2] = (byte) (arr[i] < 0 ? 0 : 2);
+        }
+        return b;
+    }
+    public int[] toIntConvert(byte[] b) {
+        int[] arr = new int[5];
+        for(int i = 0; i < arr.length; i ++) {
+            int ones = (int) b[i*3];
+            int tens = ((int) b[(i*3)+1]) * 128;
+            int sign = ((int) b[(i*3)+2]) - 1;
+            arr[i] = (ones + tens) * sign;
+        }
+        return arr;
     }
     public void send() {
-        byteOut = new byte[]{(byte) (mouseX / 256), (byte) (mouseX % 256),
-                (byte) (ballX / 256), (byte) (ballX % 256),
-                (byte) ((height-ballY) / 256), (byte) ((height-ballY) % 256),
-                (byte) (vX+8),(byte) (8-vY)};
+        byteOut = toByteConvert(new int[] {mouseX,ballX,height-ballY,vX,vY * -1});
     }
     public void receive() {
-        opponent = (int) byteIn[0] * 256 + ((int) byteIn[1] >= 0 ? ((int) byteIn[1]) : ((int) byteIn[1] + 256));
-        ballX = (int) byteIn[2] * 256 + ((int) byteIn[3] >= 0 ? ((int) byteIn[3]) : ((int) byteIn[3] + 256));
-        ballY = (int) byteIn[4] * 256 + ((int) byteIn[5] >= 0 ? ((int) byteIn[5]) : ((int) byteIn[5] + 256));
-        vX = (int) byteIn[6] - 8;
-        vY = (int) byteIn[7] - 8;
+        int[] arr = toIntConvert(byteIn);
+        opponent = arr[0];
+        if (vX == 0 && timePassed < 10) {
+            vX = 4;
+            vY = 4;
+            ballX = width/2;
+            ballY = height/2;
+        } else if(timePassed > 10) {
+            ballX = arr[1];
+            ballY = arr[2];
+            vY = arr[4];
+            vX = arr[3];
+        }
     }
     public void ball() {
         if((ballX+(width/40) >= width && vX > 0) || (ballX <= 0 && vX < 0)) {
@@ -40,7 +66,6 @@ public class TestClient extends Ease2 {
                 (ballX+(width/40) > mouseX-(width/8) && ballX < mouseX+(width/8) && ballY < height/10 && ballY+(width/40) > height/20)) {
             vY *= -1;
         }
-        System.out.println(ballX + " " + ballY);
         ballX += vX;
         ballY += vY;
         rect(ballX,ballY,width/40,width/40,black);

@@ -13,24 +13,17 @@ public class Example extends Ease2 {
         Example e = new Example(400,400,100);
     }
     public void paint() {
-        receive();
         ball();
         me();
         you();
-        send();
-    }
-    public void send() {
-
-    }
-    public void receive() {
-
     }
     public void ball() {
         if((ballX+(width/40) >= width && vX > 0) || (ballX <= 0 && vX < 0)) {
             vX *= -1;
         }
         if((ballY+(width/40) >= height) || ballY <= 0 ||
-                (ballX+(width/40) > mouseX-(width/8) && ballX < mouseX+(width/8) && ballY < height/10 && ballY+(width/40) > height/20)) {
+                (ballX+(width/40) > mouseX-(width/8) && ballX < mouseX+(width/8) && ballY < height/10 && ballY+(width/40) > height/20) ||
+                (ballX+(width/40) > mouseX-(width/8) && ballX < mouseX + (width/8) && ballY < 19*height/20&&ballY+(width/40) > 9*height/10)) {
             vY *= -1;
         }
         ballX += vX;
@@ -41,6 +34,6 @@ public class Example extends Ease2 {
         rect(mouseX-(width/8),height/20,width/4,height/20,black);
     }
     public void you() {
-        rect(opponent-(width/8),height/20,width/4,height/20,black);
+        rect(mouseX-(width/8),9*height/10,width/4,height/20,black);
     }
 }

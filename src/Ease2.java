@@ -31,8 +31,9 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
     String StringIn = "";
     String StringOut = "";
     private Timer t;
+    private boolean close = false;
 
-    public Ease2(int width, int height, int refreshRate, String easeType) {
+    public Ease2(int width, int height, int refreshRate, String easeType) throws InterruptedException {
         this.easeType = easeType;
         JFrame frame = new JFrame("Game");
         frame.add(this);
@@ -41,7 +42,6 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
         frame.setVisible(true);
         frame.setSize(width, height + 22);
         frame.setResizable(false);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setFocusable(true);
         frame.setLocationRelativeTo(null);
         this.frame = frame;
@@ -49,6 +49,44 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
         this.height = height;
         //setting common defaults for a screen.^^^
         this.refreshRate = refreshRate;
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                System.err.println("EXIT.");
+                if(easeType.equals("UDPclient")) {
+                    close = true;
+                    sendData = new byte[256];
+                    int o = "#2fishBlueFish".getBytes().length;
+                    DatagramPacket sendPacket = new DatagramPacket(
+                            ("#2fishBlueFish").getBytes(),
+                            o,
+                            IPAddress, 9090);
+                    try {
+                        udpSocket.send(sendPacket);
+                        System.exit(0);
+                    } catch (IOException e) {
+                        System.err.println(e);
+                    }
+                } else if(easeType.equals("UDPserver")) {
+                    try {
+                        receiveData = new byte[256];
+                        sendData = new byte[256];
+                        DatagramPacket receivePacket;
+                        receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                        udpSocket.receive(receivePacket);
+                        sendData = "#2fishBlueFish".getBytes();
+                        udpSocket.send(
+                                new DatagramPacket(sendData,sendData.length,receivePacket.getAddress(),receivePacket.getPort())
+                        );
+                        System.exit(0);
+                    } catch(IOException e) {
+                        System.err.println(e);
+                    }
+                } else {
+                    System.exit(0);
+                }
+            }
+        });
     }
     public void paintComponent(Graphics g) {
         g2d = (Graphics2D)g;
@@ -83,6 +121,9 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
             UDPclientS();
         } else if(easeType == "TCPclient") {
             TCPclientS();
+        }
+        if(close) {
+            System.exit(0);
         }
     }
 
@@ -143,6 +184,10 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
             receivePacket = new DatagramPacket(receiveData, receiveData.length);
             udpSocket.receive(receivePacket);
             byteIn = receivePacket.getData();
+            if(new String(receiveData, 0, receivePacket.getLength()).equals("#2fishBlueFish")) {
+                System.err.println("Exiting");
+                System.exit(0);
+            }
             paint();
             sendData = byteOut;
             udpSocket.send(
@@ -176,6 +221,10 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             udpSocket.receive(receivePacket);
             byteIn = receivePacket.getData();
+            if(new String(receiveData, 0, receivePacket.getLength()).equals("#2fishBlueFish")) {
+                System.err.println("Exiting");
+                System.exit(0);
+            }
             paint();
         } catch(IOException e) {
             System.err.println(e);
@@ -203,7 +252,6 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
         g2d.setColor(c);
         g2d.fillRect(x,y,w,h);
     }
-
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -243,4 +291,5 @@ public class Ease2 extends JPanel implements KeyListener, MouseListener {
     public void mouseExited(MouseEvent e) {
 
     }
+
 }
